@@ -18,17 +18,16 @@ class HTMLReportWriter:
 
     def __init__(self, config: ReportConfig):
         self.config = config
-        # Template is at project_root/templates/report.html.j2.
-        # Resolve relative to this file first (works regardless of CWD,
-        # e.g. when the CLI is invoked from another directory), then fall
-        # back to CWD for custom project-local template overrides.
-        package_templates = Path(__file__).resolve().parent.parent.parent / "templates"
+        # Template ships inside the package (localguard/templates/) so it is
+        # available in wheel installs regardless of CWD; fall back to CWD for
+        # project-local template overrides.
+        package_templates = Path(__file__).resolve().parent.parent / "templates"
         cwd_templates = Path.cwd() / "templates"
         if package_templates.exists():
             self.templates_dir = package_templates
         elif cwd_templates.exists():
             self.templates_dir = cwd_templates
-        else:  # pragma: no cover - templates ship with the repo
+        else:  # pragma: no cover - templates ship with the package
             self.templates_dir = package_templates
         self._setup_jinja()
 

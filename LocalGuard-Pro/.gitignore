@@ -55,6 +55,11 @@ safety-report.json
 
 # Reports
 security-reports/
+temp-reports/
+*-report.json
+bandit-*.json
+semgrep-report.json
+trufflehog-report.json
 *.html
 !templates/*.html
 
