@@ -1,0 +1,57 @@
+# LocalGuard-Pro Default Configuration
+# This file is bundled with the package and used as fallback
+
+target:
+  allowed_hosts:
+    - "localhost"
+    - "127.0.0.1"
+    - "0.0.0.0"
+    - "*.local"
+    - "*.test"
+  custom_private_ranges:
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+
+scan:
+  dast:
+    max_depth: 2
+    rate_limit_delay: 0.4
+    timeout: 10
+    follow_redirects: true
+    custom_wordlist: null
+  sast:
+    exclude_patterns:
+      - "**/node_modules/**"
+      - "**/vendor/**"
+      - "**/.git/**"
+      - "**/dist/**"
+      - "**/build/**"
+      - "**/venv/**"
+      - "**/__pycache__/**"
+      - "**/.pytest_cache/**"
+      - "**/.mypy_cache/**"
+      - "**/.ruff_cache/**"
+    entropy_threshold: 4.5
+    custom_patterns: []
+  sca:
+    online_cve: false
+    cache_ttl_hours: 24
+    ecosystems:
+      - "composer"
+      - "npm"
+
+report:
+  output_dir: "./security-reports"
+  formats:
+    - "json"
+    - "html"
+    - "terminal"
+  html_theme: "auto"
+  title: "LocalGuard-Pro Security Audit Report"
+  company_name: ""
+
+ignore:
+  paths: []
+  patterns: []
+  findings: []

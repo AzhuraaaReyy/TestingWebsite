@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="{{ html_theme }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report_title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        :root {
+            --bs-primary: #2563eb;
+            --bs-secondary: #64748b;
+            --bs-success: #16a34a;
+            --bs-danger: #dc2626;
+            --bs-warning: #f59e0b;
+            --bs-info: #0ea5e9;
+        }
+        [data-bs-theme="dark"] {
+            --bs-body-bg: #0f172a;
+            --bs-body-color: #e2e8f0;
+            --bs-card-bg: #1e293b;
+            --bs-border-color: #334155;
+        }
+        .severity-critical { border-left: 4px solid #dc2626; }
+        .severity-high { border-left: 4px solid #dc2626; }
+        .severity-medium { border-left: 4px solid #f59e0b; }
+        .severity-low { border-left: 4px solid #16a34a; }
+        .severity-info { border-left: 4px solid #0ea5e9; }
+        .badge-critical { background-color: #dc2626; }
+        .badge-high { background-color: #dc2626; }
+        .badge-medium { background-color: #f59e0b; color: #000; }
+        .badge-low { background-color: #16a34a; }
+        .badge-info { background-color: #0ea5e9; }
+        .finding-card { transition: box-shadow 0.2s; }
+        .finding-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .evidence-box { font-family: 'Monospace', monospace; font-size: 0.875rem; max-height: 200px; overflow-y: auto; }
+        .stat-card { transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); }
+        .filter-btn.active { font-weight: 600; }
+        @media print {
+            .no-print { display: none !important; }
+            .finding-card { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body data-bs-theme="{{ html_theme }}">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary no-print">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-shield-lock me-2"></i>{{ report_title }}
+            </a>
+            <div class="navbar-nav ms-auto">
+                <button class="btn btn-outline-light btn-sm me-2" onclick="toggleTheme()">
+                    <i class="bi bi-moon-stars" id="theme-icon"></i>
+                </button>
+                <button class="btn btn-light btn-sm" onclick="window.print()">
+                    <i class="bi bi-printer me-1"></i>Print
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h1 class="h3 mb-1">{{ report_title }}</h1>
+                        {% if company_name %}
+                        <p class="text-muted mb-0">{{ company_name }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="text-end">
+                        <p class="mb-1"><strong>Target:</strong> {{ result.target.url }}</p>
+                        <p class="mb-0"><strong>Scan Date:</strong> {{ generated_at }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <div class="card stat-card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h2 class="mb-0">{{ result.severity_counts.Critical or 0 }}</h2>
+                        <small>Critical</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stat-card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h2 class="mb-0">{{ result.severity_counts.High or 0 }}</h2>
+                        <small>High</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stat-card bg-warning text-dark">
+                    <div class="card-body text-center">
+                        <h2 class="mb-0">{{ result.severity_counts.Medium or 0 }}</h2>
+                        <small>Medium</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stat-card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h2 class="mb-0">{{ result.severity_counts.Low or 0 }}</h2>
+                        <small>Low</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stat-card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h2 class="mb-0">{{ result.severity_counts.Info or 0 }}</h2>
+                        <small>Info</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stat-card bg-secondary text-white">
+                    <div class="card-body text-center">
+                        <h2 class="mb-0">{{ result.total_findings }}</h2>
+                        <small>Total</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Breakdown -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Findings by Category</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                                    <span><i class="bi bi-globe me-2"></i>DAST</span>
+                                    <span class="badge bg-primary">{{ result.category_counts.DAST or 0 }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                                    <span><i class="bi bi-code me-2"></i>SAST</span>
+                                    <span class="badge bg-success">{{ result.category_counts.SAST or 0 }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-between align-items-center p-2">
+                                    <span><i class="bi bi-box-seam me-2"></i>SCA</span>
+                                    <span class="badge bg-info">{{ result.category_counts.SCA or 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="row mb-4 no-print">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-secondary filter-btn active" data-filter="all">
+                                <i class="bi bi-funnel me-1"></i> All
+                            </button>
+                            <button class="btn btn-outline-danger filter-btn" data-filter="Critical">
+                                <i class="bi bi-exclamation-octagon me-1"></i> Critical
+                            </button>
+                            <button class="btn btn-outline-danger filter-btn" data-filter="High">
+                                <i class="bi bi-exclamation-triangle me-1"></i> High
+                            </button>
+                            <button class="btn btn-outline-warning filter-btn" data-filter="Medium">
+                                <i class="bi bi-exclamation-circle me-1"></i> Medium
+                            </button>
+                            <button class="btn btn-outline-success filter-btn" data-filter="Low">
+                                <i class="bi bi-info-circle me-1"></i> Low
+                            </button>
+                            <button class="btn btn-outline-info filter-btn" data-filter="Info">
+                                <i class="bi bi-info-circle me-1"></i> Info
+                            </button>
+                            <div class="ms-auto">
+                                <input type="text" id="search-input" class="form-control form-control-sm" placeholder="Search findings..." style="width: 250px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Findings -->
+        <div class="row">
+            <div class="col-12">
+                <div id="findings-container">
+                    {% for finding in findings %}
+                    <div class="card finding-card mb-3 severity-{{ finding.severity.value|lower }}" 
+                         data-severity="{{ finding.severity.value }}" 
+                         data-category="{{ finding.category.value }}"
+                         data-title="{{ finding.title|lower }}"
+                         data-id="{{ finding.id }}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge badge-{{ finding.severity.value|lower }} me-2">{{ finding.severity.value }}</span>
+                                <span class="badge bg-secondary me-2">{{ finding.category.value }}</span>
+                                <span class="text-muted small">{{ finding.id }}</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#finding-{{ loop.index }}"
+                                        aria-expanded="false">
+                                    <i class="bi bi-chevron-down"></i> Details
+                                </button>
+                            </div>
+                        </div>
+                        <div class="collapse" id="finding-{{ loop.index }}">
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Title</h6>
+                                        <p class="mb-0">{{ finding.title }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Endpoint</h6>
+                                        <p class="mb-0 font-monospace small">{{ finding.endpoint }}</p>
+                                    </div>
+                                </div>
+                                {% if finding.parameter %}
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <h6 class="text-muted">Parameter</h6>
+                                        <p class="mb-0 font-monospace">{{ finding.parameter }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if finding.file_path %}
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <h6 class="text-muted">File Location</h6>
+                                        <p class="mb-0 font-monospace">{{ finding.file_path }}{% if finding.line_number %}:{{ finding.line_number }}{% endif %}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <h6 class="text-muted">Evidence</h6>
+                                        <div class="evidence-box bg-light p-3 rounded border">{{ finding.evidence }}</div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Impact</h6>
+                                        <p class="mb-0">{{ finding.impact }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Remediation</h6>
+                                        <p class="mb-0">{{ finding.remediation }}</p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        {% if finding.cwe %}
+                                        <h6 class="text-muted">CWE</h6>
+                                        <p class="mb-0"><a href="https://cwe.mitre.org/data/definitions/{{ finding.cwe.replace('CWE-', '') }}.html" target="_blank">{{ finding.cwe }}</a></p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {% if finding.owasp %}
+                                        <h6 class="text-muted">OWASP</h6>
+                                        <p class="mb-0">{{ finding.owasp }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="text-muted">References</h6>
+                                        {% if finding.references %}
+                                        <ul class="mb-0 small">
+                                            {% for ref in finding.references %}
+                                            <li><a href="{{ ref }}" target="_blank">{{ ref }}</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                        {% else %}
+                                        <p class="mb-0 text-muted">None</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if findings|length == 0 %}
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                    <h3 class="mt-3">No Findings!</h3>
+                    <p class="text-muted">Your application appears to be secure. Great job!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <hr class="my-4">
+        <footer class="text-center text-muted small no-print">
+            <p>Generated by <strong>LocalGuard-Pro</strong> v1.0.0 | {{ generated_at }}</p>
+            <p>Internal Security Auditor for Local/Staging Environments</p>
+        </footer>
+    </div>
+
+    <script>
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            const current = html.getAttribute('data-bs-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-bs-theme', newTheme);
+            icon.className = newTheme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+            localStorage.setItem('theme', newTheme);
+        }
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || '{{ html_theme }}';
+        if (savedTheme !== 'auto') {
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            document.getElementById('theme-icon').className = savedTheme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+        }
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                filterFindings();
+            });
+        });
+
+        document.getElementById('search-input').addEventListener('input', filterFindings);
+
+        function filterFindings() {
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('#findings-container .finding-card');
+
+            cards.forEach(card => {
+                const severity = card.dataset.severity;
+                const title = card.dataset.title;
+                const id = card.dataset.id;
+
+                const matchesFilter = activeFilter === 'all' || severity === activeFilter;
+                const matchesSearch = searchTerm === '' || title.includes(searchTerm) || id.toLowerCase().includes(searchTerm);
+
+                card.style.display = matchesFilter && matchesSearch ? 'block' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

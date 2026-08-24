@@ -1,0 +1,143 @@
+# React/TypeScript/Vite/Next.js Specific Sensitive Paths
+# Paths that should not be exposed in production builds
+
+# Build Output (should be served, but source maps shouldn't)
+/build/
+/dist/
+/.next/
+/out/
+/vite-dist/
+
+# Source Maps (CRITICAL - should NOT be in production)
+*.js.map
+*.js.map.gz
+*.ts.map
+*.tsx.map
+/*.map
+/source-maps/
+/sourcemaps/
+
+# React Source (should not be in production)
+/src/
+/src/**/*
+/pages/
+/components/
+/hooks/
+/utils/
+/services/
+/store/
+/contexts/
+/types/
+/styles/
+/assets/
+
+# TypeScript Config
+tsconfig.json
+tsconfig.node.json
+tsconfig.build.json
+tsconfig.eslint.json
+
+# Vite Config
+vite.config.ts
+vite.config.js
+vite.config.*.ts
+vite.config.*.js
+
+# Next.js Config
+next.config.js
+next.config.ts
+next.config.mjs
+next-env.d.ts
+
+# Package & Dependency
+package.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+# Environment (Frontend)
+.env
+.env.local
+.env.production
+.env.development
+.env.staging
+.env.test
+.env.*.local
+
+# Vite/React Specific
+index.html
+public/
+public/vite.svg
+public/robots.txt
+public/manifest.json
+
+# Testing
+vitest.config.ts
+vitest.config.js
+jest.config.js
+jest.config.ts
+cypress.config.ts
+cypress.config.js
+playwright.config.ts
+playwright.config.js
+
+# Linting & Formatting
+.eslintrc.js
+.eslintrc.json
+.eslintrc.yml
+.eslintrc.yaml
+.eslintignore
+.prettierrc
+.prettierrc.js
+.prettierrc.json
+.prettierignore
+.stylelintrc
+.stylelintrc.js
+.stylelintrc.json
+
+# Git & CI
+.gitignore
+.gitattributes
+.github/workflows/
+.gitlab-ci.yml
+.husky/
+commitlint.config.js
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Coverage
+coverage/
+.nyc_output/
+
+# TypeScript Build Info
+*.tsbuildinfo
+
+# Bundle Analysis
+stats.html
+stats.json
+bundle-analysis/
+
+# Storybook
+.storybook/
+storybook-static/
+
+# PWA
+public/manifest.json
+public/sw.js
+public/workbox-*.js

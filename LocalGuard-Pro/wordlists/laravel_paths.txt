@@ -1,0 +1,137 @@
+# Laravel-Specific Sensitive Paths
+# Additional paths specific to Laravel applications
+
+# Laravel Core
+artisan
+server.php
+public/index.php
+public/.htaccess
+public/robots.txt
+public/favicon.ico
+public/mix-manifest.json
+public/hot
+public/build/
+public/storage/
+
+# Laravel Config (should not be exposed)
+config/app.php
+config/auth.php
+config/broadcasting.php
+config/cache.php
+config/cors.php
+config/database.php
+config/filesystems.php
+config/hashing.php
+config/logging.php
+config/mail.php
+config/queue.php
+config/sanctum.php
+config/services.php
+config/session.php
+config/view.php
+
+# Laravel Storage (sensitive)
+storage/app/
+storage/framework/
+storage/logs/
+storage/debugbar/
+storage/clockwork/
+
+# Laravel Bootstrap Cache
+bootstrap/app.php
+bootstrap/cache/
+bootstrap/cache/packages.php
+bootstrap/cache/services.php
+bootstrap/cache/config.php
+bootstrap/cache/routes.php
+
+# Laravel Vendor (should not be exposed)
+vendor/autoload.php
+vendor/composer/
+vendor/laravel/
+
+# Laravel Tests
+tests/
+phpunit.xml
+phpunit.xml.dist
+phpunit.coverage.xml
+
+# Laravel Env (critical)
+.env
+.env.example
+.env.local
+.env.production
+.env.staging
+.env.testing
+.env.*.local
+.env.backup
+
+# Laravel Specific Files
+database/migrations/
+database/seeders/
+database/factories/
+database/sqlite/
+database/database.sqlite
+
+# Laravel Horizon (if used)
+horizon/
+config/horizon.php
+
+# Laravel Telescope (if used - debug tool, should not be in prod)
+telescope/
+config/telescope.php
+
+# Laravel Nova (if used - admin panel)
+nova/
+config/nova.php
+
+# Laravel Sanctum (API tokens)
+sanctum/
+config/sanctum.php
+
+# Laravel Passport (OAuth2)
+passport/
+config/passport.php
+
+# Laravel Echo/Pusher
+config/broadcasting.php
+
+# Laravel Scout (search)
+config/scout.php
+
+# Laravel Cashier (billing)
+config/cashier.php
+
+# Laravel Socialite
+config/services.php (has OAuth credentials)
+
+# Laravel Fortify
+config/fortify.php
+
+# Laravel Jetstream
+config/jetstream.php
+
+# Laravel Livewire
+config/livewire.php
+
+# Laravel Filament (admin panel)
+filament/
+config/filament.php
+
+# Laravel Backup (spatie)
+config/backup.php
+
+# Laravel Activity Log (spatie)
+config/activitylog.php
+
+# Laravel Permission (spatie)
+config/permission.php
+
+# Laravel Media Library (spatie)
+config/medialibrary.php
+
+# Laravel Response Cache (spatie)
+config/responsecache.php
+
+# Laravel Query Builder (spatie)
+config/query-builder.php

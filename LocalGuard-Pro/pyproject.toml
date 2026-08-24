@@ -1,0 +1,136 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "localguard-pro"
+version = "1.0.0"
+description = "Internal Security Auditor CLI for Local/Staging Web Applications"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "DevSecOps Architect", email = "devsecops@localguard.local"}
+]
+keywords = ["security", "penetration-testing", "dast", "sast", "sca", "vulnerability-scanner"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = [
+    "typer[all]>=0.9.0",
+    "rich>=13.7.0",
+    "pydantic>=2.5.0",
+    "pyyaml>=6.0.1",
+    "httpx>=0.26.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=4.9.0",
+    "jinja2>=3.1.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+    "black>=23.0.0",
+    "pre-commit>=3.6.0",
+]
+
+[project.scripts]
+localguard = "localguard.cli.app:app"
+
+[project.urls]
+Homepage = "https://github.com/localguard/localguard-pro"
+Repository = "https://github.com/localguard/localguard-pro"
+Issues = "https://github.com/localguard/localguard-pro/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["localguard"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = [".git", "__pycache__", ".venv", "venv", "dist", "build", "*.egg-info"]
+
+[tool.ruff.lint]
+# Core correctness + style rules. Opinionated families (PL, TRY, ARG, ERA...)
+# are intentionally omitted; see git history if they should be re-enabled.
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+ignore = [
+    "E501",   # line length handled by formatter
+    "B008",   # function call in argument defaults (typer pattern)
+]
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S113"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+# Baseline: analyze untyped defs, but don't require full annotations yet.
+# Tighten toward strict incrementally as annotations are added.
+check_untyped_defs = true
+no_implicit_optional = true
+strict_optional = true
+show_error_codes = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = ["toml", "yaml"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers --strict-config"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow running tests",
+]
+
+[tool.coverage.run]
+source = ["localguard"]
+omit = ["tests/*", "*/conftest.py"]
+
+[tool.coverage.report]
+# Raised incrementally as coverage improves; current baseline: 52%
+fail_under = 50
+show_missing = true
+precision = 2
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.git
+  | \.venv
+  | venv
+  | dist
+  | build
+  | \.egg-info
+  | __pycache__
+)/
+'''

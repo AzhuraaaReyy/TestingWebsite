@@ -1,0 +1,72 @@
+# LocalGuard-Pro Configuration Example
+# Copy this to localguard.yaml or .localguard.yaml and customize
+
+target:
+  allowed_hosts:
+    - "localhost"
+    - "127.0.0.1"
+    - "0.0.0.0"
+    - "*.local"
+    - "*.test"
+    # Add your custom local domains:
+    # - "myapp.local"
+    # - "dev.mycompany.internal"
+  custom_private_ranges:
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+    # Add your custom private ranges:
+    # - "100.64.0.0/10"  # Carrier-grade NAT
+
+scan:
+  dast:
+    max_depth: 2              # Crawl depth (1-10)
+    rate_limit_delay: 0.4     # Seconds between requests (0.1-5.0)
+    timeout: 10               # Request timeout in seconds (5-60)
+    follow_redirects: true    # Follow HTTP redirects
+    custom_wordlist: null     # Path to additional wordlist file
+  
+  sast:
+    exclude_patterns:
+      - "**/node_modules/**"
+      - "**/vendor/**"
+      - "**/.git/**"
+      - "**/dist/**"
+      - "**/build/**"
+      - "**/venv/**"
+      - "**/__pycache__/**"
+      - "**/.pytest_cache/**"
+      - "**/.mypy_cache/**"
+      - "**/.ruff_cache/**"
+      # Add your custom exclusions:
+      # - "**/legacy/**"
+      # - "**/generated/**"
+    entropy_threshold: 4.5    # Shannon entropy threshold (3.0-8.0)
+    custom_patterns: []       # Additional regex patterns for secrets
+  
+  sca:
+    online_cve: false         # Enable online CVE lookup (requires internet)
+    cache_ttl_hours: 24       # CVE cache TTL (1-168 hours)
+    ecosystems:
+      - "composer"            # PHP/Laravel dependencies
+      - "npm"                 # Node.js/React dependencies
+      # - "pip"               # Python dependencies (if applicable)
+
+report:
+  output_dir: "./security-reports"  # Output directory
+  formats:
+    - "json"                  # JSON report (CI/CD)
+    - "html"                  # HTML report (human-readable)
+    - "terminal"              # Terminal summary
+  html_theme: "auto"          # light, dark, auto
+  title: "LocalGuard-Pro Security Audit Report"  # Custom report title
+  company_name: "Your Company"  # Company name for branding
+
+ignore:
+  paths:                      # File paths to ignore (glob patterns)
+    # - "**/tests/**"
+    # - "**/migrations/**"
+  patterns:                   # Finding patterns to ignore (regex)
+    # - "MissingSecurityHeader.*X-Frame-Options"
+  findings:                   # Specific finding IDs to suppress
+    # - "LG-DAST-HEADER-001"

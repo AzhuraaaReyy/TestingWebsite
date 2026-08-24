@@ -1,0 +1,16 @@
+# Core
+typer==0.25.1
+rich==14.0.0
+pydantic==2.13.4
+pyyaml==6.0.3
+
+# HTTP & Crawling
+httpx==0.28.1
+beautifulsoup4==4.15.0
+lxml==6.1.2
+
+# Templating
+jinja2==3.1.6
+
+# Utilities
+python-dotenv==1.2.2
