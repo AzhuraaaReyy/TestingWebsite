@@ -101,6 +101,9 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+# Make the project root importable regardless of how pytest is invoked
+# (`pytest` vs `python -m pytest`)
+pythonpath = ["."]
 addopts = "-v --strict-markers --strict-config"
 markers = [
     "unit: Unit tests",
